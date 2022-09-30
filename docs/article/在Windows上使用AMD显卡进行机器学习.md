@@ -1,6 +1,5 @@
 ---
 title: 在Windows上使用AMD显卡进行深度学习
-sidebar: auto
 ---
 # 在Windows上使用AMD显卡进行深度学习
 

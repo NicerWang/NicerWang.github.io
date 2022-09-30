@@ -1,6 +1,5 @@
 ---
 title: HomePage
-sidebar: auto
 ---
 
 # HomePage
