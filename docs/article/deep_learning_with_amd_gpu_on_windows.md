@@ -3,17 +3,17 @@ title: Deep Learning with AMD GPU on Windows
 ---
 # Deep Learning with AMD GPU on Windows
 
-> 初次编写时间：2022/09/26
+> First written：2022/09/26
 
-以往，AMD显卡进行深度学习，需要使用Linux系统，并安装ROCm。
+In the past，using AMD GPU for DL，we need Linux with ROCm installed.
 
-而现在，微软开源了[DirectML](https://github.com/microsoft/DirectML)项目，使得任何支持DirectX12的显卡，都可以在Windows平台上进行深度学习。
+Now, Microsoft published [DirectML](https://github.com/microsoft/DirectML), which makes any GPU supporting DirectX12 be able to be used for DL on Windows.
 
-## 如何配置
+## How to config
 
-这里以`PyTorch-DirectML`为例进行配置：
+Choose `PyTorch-DirectML` as an example：
 
-1. （可选）安装`MiniConda`（`Python3.8`版本）环境，并配置环境变量：
+1. (Optional) Install `MiniConda`（`Python3.8`）environment，and set environment variables：
 
    ```
    Path\To\Miniconda3
@@ -21,13 +21,13 @@ title: Deep Learning with AMD GPU on Windows
    Path\To\Miniconda3\Library\bin
    ```
 
-2. 创建一个`Python3.8`环境（若不使用`Conda`，也需使用`Python3.8`环境）
+2. Create a `Python3.8` env（If without `Conda`, you also need `Python3.8`)
 
    ```bash
    conda create -n directML python=3.8
    ```
 
-3.  激活环境并开始安装依赖
+3.  Activate env and install dependencies
 
    ```bash
    pip install torchvision==0.9.0
@@ -35,29 +35,27 @@ title: Deep Learning with AMD GPU on Windows
    pip install pytorch-directml
    ```
 
-   > 这里需要注意，由于很多第三方库都是以`torch`为依赖，在安装后，`torch`将会覆盖`pytorch-directml`，需要重新执行后两行。
+   > Attention: Becasue some third-party libs chose `torch` as dependency，`torch` will override `pytorch-directml`，so re-running the last 2 lines is needed.
 
-4. 至此，配置完成，**只需要在训练时选择设备为`dml`即可。**
+4. Ok, **just need to set device to `dml`**
 
-## 运行一个开源项目
+## Run an Opensource Project
 
-选择了腾讯开源的[GFPGAN](https://github.com/TencentARC/GFPGAN)，这是一个恢复真实人脸的深度神经网络，同时内置了[Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN)支持，可以恢复人脸之外的背景。
+Choose [GFPGAN](https://github.com/TencentARC/GFPGAN) from Tencent as an example, which aims at recover faces, with [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) built in, which can enhance the background.
 
-1. 按照其[提示](https://github.com/TencentARC/GFPGAN#wrench-dependencies-and-installation)进行安装：
+1. Follow its [Guide](https://github.com/TencentARC/GFPGAN#wrench-dependencies-and-installation)：
 
-   **教程中提及：如果不仅想要修复人脸，还需要增强背景，则还需要安装Real-ESRGAN。**
+   **Mentioned: If you want to enhance the background, Real-ESRGAN installation is needed**
 
-   在完成教程后，需要手动下载预训练的模型：
+   After Guide, download pre-trained model:
 
    ```bash
    wget https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.3.pth -P experiments/pretrained_models
    ```
 
-   > 也可以使用其他工具下载后移动到对应目录。
-   >
-   > 另外，此项目还依赖了很多其他的深度神经网络，这些参数会在首次运行时下载，你也可以观察控制台信息进行手动下载，并移动到对应目录。
+   > You can use other tools to download to specific directory.
 
-2. 项目的使用方法为：
+2. How to use：
 
    ```bash
    Usage: python inference_gfpgan.py -i inputs/whole_imgs -o results -v 1.3 -s 2 [options]...
@@ -75,16 +73,16 @@ title: Deep Learning with AMD GPU on Windows
      -ext                 Image extension. Options: auto | jpg | png, auto means using the same extension as inputs. Default: auto
    ```
 
-3. 由于教程中安装的`basicsr`和`facexlib`都依赖`torch`，所以需要再次卸载`torch`，并强制安装`pytorch-directml`：(**卸载后将不满足依赖关系，但可以正常使用**)
+3. Because `basicsr` and `facexlib` both depend on `torch`, you need to uninstall`torch`, and force to reinstall `pytorch-directml`: (**Dependency relations will not be satisfied, but ok**)
 
    ```bash
    pip uninstall torch
    pip install --force-reinstall pytorch-directml
    ```
 
-4. 关于Real-ESRGAN
+4. About Real-ESRGAN
 
-   由于其在CPU上运行较慢，所以在CPU设备上默认关闭，在`inference_gfpgan.py`第59行，将这部分代码修改即可启用该功能：
+   The unoptimized RealESRGAN is slow on CPU. If you really want to use it on CPU, please modify the corresponding codes: (`inference_gfpgan.py` Line59)
 
    ```python
    # ------------------------ set up background upsampler ------------------------
@@ -104,40 +102,40 @@ title: Deep Learning with AMD GPU on Windows
        bg_upsampler = None
    ```
 
-   **至此，可在CPU上顺利完成完整的图片修复工作。**
+   **Everything is OK here.**
 
-5. 支持DirectML
+5. DirectML Support
 
-   在`utils.py`中：
+   In `utils.py`:
 
    ```python
-   # 将以下代码
+   # Before
    self.device = torch.device('cuda' if True else 'cpu') if device is None else device
-   # 改为
+   # After
    self.device = torch.device('dml')
    ```
 
-   进行以上操作后，仍然报错`RuntimeError: bad optional access`，排查问题发现，在`facexlib`的文件`lib\site-packages\facexlib\detection\retinaface.py`中，出现了这一行代码：
+   After change, we still have `RuntimeError: bad optional access`, after inspection, I find file `lib\site-packages\facexlib\detection\retinaface.py` from `facexlib`, has a line of code：
 
    ```python
    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
    ```
 
-   说明`facexlib`没有使用我们的设备设置，使用管理员权限，强制修改该文件的这一行为：
+   This suggests that `facexlib` used wrong device, we need to use administartion privilege to change it to:
 
    ```python
    device = torch.device('dml')
    ```
 
-   此时，运行项目注意到GPU占用率开始提高，但随即报错：
+   Now, GPU usage grows, but an error suddenly comes:
 
    ```
    Failed inference for GFPGAN: Could not run 'aten::normal_' with arguments from the 'DML' backend.
    ```
 
-   这说明`PyTorch-DirectML`尚不支持项目中使用的`aten::normal_`算子，这不是我们的问题，而是微软还没有完成这一部分的工作，详见[RoadMap](https://github.com/microsoft/DirectML/wiki/PyTorch-DirectML-Operator-Roadmap)。
+   This means `PyTorch-DirectML` does not support `aten::normal_` operator currently, blame it on Microsoft, see [RoadMap](https://github.com/microsoft/DirectML/wiki/PyTorch-DirectML-Operator-Roadmap).
 
-   **值得一提的是，该算子将会在下个版本中被支持，不支持该算子并不意味着不能使用其进行一般的深度学习任务，或者，可以使用`tensorflow-directML`。**
+   **It is worth mentioning that, the operator will be supported in the next version. You can use `tensorflow-directML` instead, or only perform easy tasks.**  
 
 
 
