@@ -11,5 +11,5 @@ jobs:
       uses: jenkey2011/vuepress-deploy@v1.8.1
       env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        BUILD_SCRIPT: yarn && yarn build
+        BUILD_SCRIPT: npm install && npm run build
         BUILD_DIR: docs/.vuepress/dist/
