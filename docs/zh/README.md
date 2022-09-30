@@ -27,3 +27,4 @@ title: 主页
 ## 📜Blog
 
 * [在Windows上使用AMD显卡进行深度学习](./article/deep_learning_with_amd_gpu_on_windows.md)
+* [为旧AMD显卡安装ROCm版本的tensorflow](./article/install_rocm_tensorflow_for_old_AMD_GPU.md)
