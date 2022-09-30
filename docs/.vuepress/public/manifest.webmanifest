@@ -1,11 +1,11 @@
 {
-  "name": "NicerWang",
-  "short_name": "Nicer",
-  "description": "Notes of NicerWang",
+  "name": "Zone of NicerWang",
+  "short_name": "Zone of NicerWang",
+  "description": "Zone of NicerWang",
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#fff",
-  "theme_color": "#3eaf7c",
+  "background_color": "#03588C",
+  "theme_color": "#03588C",
   "icons": [
     {
       "src": "manifest-icon-192.maskable.png",

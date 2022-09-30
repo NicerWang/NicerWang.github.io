@@ -1,7 +1,7 @@
 {
-  "name": "NicerWang",
+  "name": "NicerWang.github.io",
   "version": "1.0.0",
-  "description": "Notes of NicerWang",
+  "description": "github.io package of NicerWang",
   "main": "index.js",
   "scripts": {
     "dev": "vuepress dev docs",
@@ -12,15 +12,16 @@
     "url": "git+https://github.com/NicerWang/NicerWang.github.io.git"
   },
   "author": "NicerWang",
-  "license": "UNLICENSED",
+  "license": "CC-BY-4.0",
   "bugs": {
     "url": "https://github.com/NicerWang/NicerWang.github.io/issues"
   },
   "homepage": "NicerWang.github.io",
   "devDependencies": {
-    "@vuepress/plugin-back-to-top": "^1.9.7",
-    "@vuepress/plugin-medium-zoom": "^1.9.7",
-    "@vuepress/plugin-pwa": "^1.9.7",
-    "vuepress": "^1.9.7"
+    "@vuepress/plugin-pwa": "^2.0.0-beta.51",
+    "@vuepress/plugin-pwa-popup": "^2.0.0-beta.51",
+    "vuepress": "^2.0.0-beta.51",
+    "vuepress-plugin-full-text-search2": "^0.4.0",
+    "vuepress-plugin-seo2": "^2.0.0-beta.104"
   }
 }
