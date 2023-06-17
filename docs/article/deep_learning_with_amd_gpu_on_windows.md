@@ -5,6 +5,8 @@ title: Deep Learning with AMD GPU on Windows
 
 > First written：2022/09/26
 
+**At present, DirectML has supported some common data types of all operators, and this article will try to reconfigure GFPGAN in the near future.**
+
 In the past，using AMD GPU for DL，we need Linux with ROCm installed.
 
 Now, Microsoft published [DirectML](https://github.com/microsoft/DirectML), which makes any GPU supporting DirectX12 be able to be used for DL on Windows.

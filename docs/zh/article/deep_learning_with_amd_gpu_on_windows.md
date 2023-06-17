@@ -5,6 +5,8 @@ title: 在Windows上使用AMD显卡进行深度学习
 
 > 初次编写时间：2022/09/26
 
+**目前，DirectML项目已经支持了所有算子的部分数据类型，本文将会在近期重新尝试配置GFPGAN。**
+
 以往，AMD显卡进行深度学习，需要使用Linux系统，并安装ROCm。
 
 而现在，微软开源了[DirectML](https://github.com/microsoft/DirectML)项目，使得任何支持DirectX12的显卡，都可以在Windows平台上进行深度学习。
