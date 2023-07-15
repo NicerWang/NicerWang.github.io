@@ -4,8 +4,8 @@ title: 在Windows上使用AMD显卡进行深度学习
 # 在Windows上使用AMD显卡进行深度学习
 
 > 初次编写时间：2022/09/26
-
-**目前，DirectML项目已经支持了所有算子的部分数据类型，本文将会在近期重新尝试配置GFPGAN。**
+>
+> 上次更新时间：2023/07/15
 
 以往，AMD显卡进行深度学习，需要使用Linux系统，并安装ROCm。
 
@@ -15,7 +15,7 @@ title: 在Windows上使用AMD显卡进行深度学习
 
 这里以`PyTorch-DirectML`为例进行配置：
 
-1. （可选）安装`MiniConda`（`Python3.8`版本）环境，并配置环境变量：
+1. （可选）安装`MiniConda`环境，并配置环境变量：
 
    ```
    Path\To\Miniconda3
@@ -23,23 +23,25 @@ title: 在Windows上使用AMD显卡进行深度学习
    Path\To\Miniconda3\Library\bin
    ```
 
-2. 创建一个`Python3.8`环境（若不使用`Conda`，也需使用`Python3.8`环境）
+2. 创建一个`Python`环境（若不使用`Conda`，也需使用`3.8-3.10`版本）
 
    ```bash
    conda create -n directML python=3.8
    ```
 
-3.  激活环境并开始安装依赖
+3. 激活环境并开始安装依赖
 
    ```bash
-   pip install torchvision==0.9.0
-   pip uninstall torch
-   pip install pytorch-directml
+   conda activate directML
+   pip install torch-directml
    ```
 
-   > 这里需要注意，由于很多第三方库都是以`torch`为依赖，在安装后，`torch`将会覆盖`pytorch-directml`，需要重新执行后两行。
+4. 使用方法
 
-4. 至此，配置完成，**只需要在训练时选择设备为`dml`即可。**
+   ```python
+   import torch_directml
+   dml = torch_directml.device() # device=dml
+   ```
 
 ## 运行一个开源项目
 
@@ -77,14 +79,7 @@ title: 在Windows上使用AMD显卡进行深度学习
      -ext                 Image extension. Options: auto | jpg | png, auto means using the same extension as inputs. Default: auto
    ```
 
-3. 由于教程中安装的`basicsr`和`facexlib`都依赖`torch`，所以需要再次卸载`torch`，并强制安装`pytorch-directml`：(**卸载后将不满足依赖关系，但可以正常使用**)
-
-   ```bash
-   pip uninstall torch
-   pip install --force-reinstall pytorch-directml
-   ```
-
-4. 关于Real-ESRGAN
+3. 关于Real-ESRGAN
 
    由于其在CPU上运行较慢，所以在CPU设备上默认关闭，在`inference_gfpgan.py`第59行，将这部分代码修改即可启用该功能：
 
@@ -101,7 +96,7 @@ title: 在Windows上使用AMD显卡进行深度学习
            tile=args.bg_tile,
            tile_pad=10,
            pre_pad=0,
-           half=False)  # need to set False in CPU mode
+           half=False)  # 视是否支持fp16而定，CPU不支持
    else:
        bg_upsampler = None
    ```
@@ -110,36 +105,27 @@ title: 在Windows上使用AMD显卡进行深度学习
 
 5. 支持DirectML
 
-   在`utils.py`中：
+   在`inference_gfpgan.py`中：为`RealESRGANer`和`GFPGANer`的构造函数，添加`device`参数。
 
    ```python
-   # 将以下代码
-   self.device = torch.device('cuda' if True else 'cpu') if device is None else device
-   # 改为
-   self.device = torch.device('dml')
-   ```
-
-   进行以上操作后，仍然报错`RuntimeError: bad optional access`，排查问题发现，在`facexlib`的文件`lib\site-packages\facexlib\detection\retinaface.py`中，出现了这一行代码：
-
-   ```python
-   device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-   ```
-
-   说明`facexlib`没有使用我们的设备设置，使用管理员权限，强制修改该文件的这一行为：
-
-   ```python
-   device = torch.device('dml')
-   ```
-
-   此时，运行项目注意到GPU占用率开始提高，但随即报错：
-
-   ```
-   Failed inference for GFPGAN: Could not run 'aten::normal_' with arguments from the 'DML' backend.
-   ```
-
-   这说明`PyTorch-DirectML`尚不支持项目中使用的`aten::normal_`算子，这不是我们的问题，而是微软还没有完成这一部分的工作，详见[RoadMap](https://github.com/microsoft/DirectML/wiki/PyTorch-DirectML-Operator-Roadmap)。
-
-   **值得一提的是，该算子将会在下个版本中被支持，不支持该算子并不意味着不能使用其进行一般的深度学习任务，或者，可以使用`tensorflow-directML`。**
-
-
+   import torch_directml
+   dml = torch_directml.device()
+   
+   bg_upsampler = RealESRGANer(..., device=dml)
+   restorer = GFPGANer(..., device=dml)
+```
+   
+**但目前存在两个问题：**
+   
+   * `upsampler`在执行几次后，便会触发`basicsr\archs\arch_util.py`中的断言，目前暂未解决：
+   
+  ```python
+     assert hh % scale == 0 and hw % scale == 0
+  ```
+   
+   * 如果禁用`realesrgan`，则人脸可以正常完成处理，但处理结果十分诡异。
+   
+  为避免引起不适，这里不展示结果，问题在于CPU输出结果正常，而DirectML输出异常。
+   
+  经过分析，问题可能出在双线性插值算子当中，我已在DirectML项目当中提出Issue，[点击这里跳转](https://github.com/microsoft/DirectML/issues/482)。
 
