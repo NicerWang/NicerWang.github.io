@@ -1,0 +1,36 @@
+{
+  "name": "Zone of NicerWang",
+  "short_name": "Zone of NicerWang",
+  "description": "Zone of NicerWang",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#03588C",
+  "theme_color": "#03588C",
+  "icons": [
+    {
+      "src": "manifest-icon-192.maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "manifest-icon-192.maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "manifest-icon-512.maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "manifest-icon-512.maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
+
