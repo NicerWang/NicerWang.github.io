@@ -4,8 +4,8 @@ title: Deep Learning with AMD GPU on Windows
 # Deep Learning with AMD GPU on Windows
 
 > First written：2022/09/26
-
-**At present, DirectML has supported some common data types of all operators, and this article will try to reconfigure GFPGAN in the near future.**
+>
+> Last updated：2023/07/15
 
 In the past，using AMD GPU for DL，we need Linux with ROCm installed.
 
@@ -15,7 +15,7 @@ Now, Microsoft published [DirectML](https://github.com/microsoft/DirectML), whic
 
 Choose `PyTorch-DirectML` as an example：
 
-1. (Optional) Install `MiniConda`（`Python3.8`）environment，and set environment variables：
+1. (Optional) Install `MiniConda` environment，and set environment variables：
 
    ```
    Path\To\Miniconda3
@@ -23,23 +23,25 @@ Choose `PyTorch-DirectML` as an example：
    Path\To\Miniconda3\Library\bin
    ```
 
-2. Create a `Python3.8` env（If without `Conda`, you also need `Python3.8`)
+2. Create a `Python` env（If without `Conda`, you also need `Python3.8-3.10`)
 
    ```bash
    conda create -n directML python=3.8
    ```
 
-3.  Activate env and install dependencies
+3. Activate env and install dependencies
 
    ```bash
-   pip install torchvision==0.9.0
-   pip uninstall torch
-   pip install pytorch-directml
+   conda activate directML
+   pip install torch-directml
    ```
 
-   > Attention: Becasue some third-party libs chose `torch` as dependency，`torch` will override `pytorch-directml`，so re-running the last 2 lines is needed.
+4. Usage
 
-4. Ok, **just need to set device to `dml`**
+   ```python
+   import torch_directml
+   dml = torch_directml.device() # device=dml
+   ```
 
 ## Run an Opensource Project
 
@@ -99,7 +101,7 @@ Choose [GFPGAN](https://github.com/TencentARC/GFPGAN) from Tencent as an example
            tile=args.bg_tile,
            tile_pad=10,
            pre_pad=0,
-           half=False)  # need to set False in CPU mode
+           half=False)  # use fp16, need to set False in CPU mode
    else:
        bg_upsampler = None
    ```
@@ -108,36 +110,31 @@ Choose [GFPGAN](https://github.com/TencentARC/GFPGAN) from Tencent as an example
 
 5. DirectML Support
 
-   In `utils.py`:
+   In `inference_gfpgan.py`: add `device` parameter to constructors of `RealESRGANer` and `GFPGANer`.
 
    ```python
-   # Before
-   self.device = torch.device('cuda' if True else 'cpu') if device is None else device
-   # After
-   self.device = torch.device('dml')
+   import torch_directml
+   dml = torch_directml.device()
+   
+   bg_upsampler = RealESRGANer(..., device=dml)
+   restorer = GFPGANer(..., device=dml)
    ```
-
-   After change, we still have `RuntimeError: bad optional access`, after inspection, I find file `lib\site-packages\facexlib\detection\retinaface.py` from `facexlib`, has a line of code：
-
-   ```python
-   device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-   ```
-
-   This suggests that `facexlib` used wrong device, we need to use administartion privilege to change it to:
-
-   ```python
-   device = torch.device('dml')
-   ```
-
-   Now, GPU usage grows, but an error suddenly comes:
-
-   ```
-   Failed inference for GFPGAN: Could not run 'aten::normal_' with arguments from the 'DML' backend.
-   ```
-
-   This means `PyTorch-DirectML` does not support `aten::normal_` operator currently, blame it on Microsoft, see [RoadMap](https://github.com/microsoft/DirectML/wiki/PyTorch-DirectML-Operator-Roadmap).
-
-   **It is worth mentioning that, the operator will be supported in the next version. You can use `tensorflow-directML` instead, or only perform easy tasks.**  
+   
+   **But there are currently two problems:**
+   
+   * `upsampler` triggers an assertion in `basicsr\archs\arch_util.py` after processing several tiles, which is not solved:
+   
+     ```` python
+     Assert that hh % scale == 0 and hw % scale == 0
+     ````
+   
+   * If `realesrgan` is disabled, the face can be processed normally, but result is very weird.
+   
+     In order to avoid discomfort, no results are shown here. 
+   
+     The CPU output are normal, but the DirectML output is abnormal.
+     
+     After analysis, the problem may be in the bilinear interpolation calculation, I have raised an issue in the DirectML project, [click here](https://github.com/microsoft/DirectML/issues/482).
 
 
 
