@@ -10,11 +10,12 @@ Hi there, I'm [Nicer Wang](https://github.com/NicerWang)!
 
 ### Projects
 
-| Name                                                  | Desc                                                        |
-| ----------------------------------------------------- | ----------------------------------------------------------- |
-| [DJudger](https://nicerwang.github.io/DJudger)        | Docker-based code execution container                       |
-| [nkcsavp](http://nkcsavp.github.io/)                  | Interactive algorithm visualization platform                |
-| [AlgoMotion](https://github.com/NicerWang/Algomotion) | Lightweight Canvas drawing tool for algorithm visualization |
+| Name                                                         | Desc                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [DJudger](https://nicerwang.github.io/DJudger)               | Docker-based code execution container                        |
+| [nkcsavp](http://nkcsavp.github.io/)                         | Interactive algorithm visualization platform                 |
+| [AlgoMotion](https://github.com/NicerWang/Algomotion)        | Lightweight Canvas drawing tool for algorithm visualization  |
+| [Scweet-Enhanced](https://github.com/NicerWang/Scweet-Enhanced) | A Scraper for Twitter (Enhanced from [Scweet](https://github.com/Altimis/Scweet)) |
 
 ### Scripts
 

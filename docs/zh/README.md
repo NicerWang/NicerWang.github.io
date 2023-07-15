@@ -10,11 +10,12 @@ title: 主页
 
 ### 项目
 
-| 名称                                                  | 描述                                   |
-| ----------------------------------------------------- | -------------------------------------- |
-| [DJudger](https://nicerwang.github.io/DJudger)        | 基于 Docker 的代码执行容器             |
-| [nkcsavp](http://nkcsavp.github.io/)                  | 交互式算法可视化平台                   |
-| [AlgoMotion](https://github.com/NicerWang/Algomotion) | 用于算法可视化的轻量级 Canvas 绘制工具 |
+| 名称                                                         | 描述                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [DJudger](https://nicerwang.github.io/DJudger)               | 基于 Docker 的代码执行容器                                   |
+| [nkcsavp](http://nkcsavp.github.io/)                         | 交互式算法可视化平台                                         |
+| [AlgoMotion](https://github.com/NicerWang/Algomotion)        | 用于算法可视化的轻量级 Canvas 绘制工具                       |
+| [Scweet-Enhanced](https://github.com/NicerWang/Scweet-Enhanced) | 用于推特的爬虫框架（由[Scweet](https://github.com/Altimis/Scweet)改进） |
 
 ### 脚本
 
